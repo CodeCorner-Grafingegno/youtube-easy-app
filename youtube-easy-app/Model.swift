@@ -7,7 +7,16 @@
 
 import Foundation
 
+// Defines the protocol to wich the model has to conform in order to handle the asyncronous fetching of video data
+protocol ModelDelegate {
+    
+    func videosFetched(_ videos:[Video])
+}
+
+
 class Model {
+    
+    var delegate:ModelDelegate?
     
     func getVideos() {
         
@@ -33,8 +42,18 @@ class Model {
             decoder.dateDecodingStrategy = .iso8601     //Rule to convert Date type when fetching Date string
             
             do {
-                let response = try decoder.decode(Response.self, from: data!)
-                dump(response)
+                let parsedJSONObject = try decoder.decode(Response.self, from: data!)
+                // dump(parsedJSONObject)
+                
+                // Check for video items not nil
+                if parsedJSONObject.items != nil {
+                    
+                    DispatchQueue.main.async {
+                        // Call the delegate method to fetch the videos
+                        self.delegate?.videosFetched(parsedJSONObject.items!)
+                    }
+                }
+                
          
             } catch {
                 // Catch the error in decoding data
