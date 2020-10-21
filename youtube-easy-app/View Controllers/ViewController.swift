@@ -27,6 +27,21 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         
         model.getVideos()
     }
+    
+    // Prepare the data to pass to the incoming segue (view). We have to pass the video.
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        // Check if a video has been selected
+        guard tableView.indexPathForSelectedRow != nil else {return}
+        
+        // Get a reference to the selected video
+        let selectedVideo = videos[tableView.indexPathForSelectedRow!.row]
+        
+        // Get the reference to the detail view controller
+        let detailVC = segue.destination as! DetailViewController
+        
+        detailVC.video = selectedVideo
+    }
 
     // MARK: - Model Delegate methods
     
@@ -48,11 +63,11 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: Constants.VIDEOCELL_ID, for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: Constants.VIDEOCELL_ID, for: indexPath) as! VideoTableViewCell
         
         // Configure cell
-        let title = self.videos[indexPath.row].title
-        cell.textLabel?.text = title
+        let video = self.videos[indexPath.row]
+        cell.setCell(video)
         
         // Return the cell
         return cell
